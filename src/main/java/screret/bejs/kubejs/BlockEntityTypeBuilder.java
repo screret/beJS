@@ -1,25 +1,20 @@
 package screret.bejs.kubejs;
 
+import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.BuilderBase;
+import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
-import dev.latvian.mods.kubejs.block.BlockBuilder;
-import dev.latvian.mods.kubejs.block.BlockItemBuilder;
-import dev.latvian.mods.rhino.util.HideFromJS;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.ModList;
-import org.jetbrains.annotations.Nullable;
-import screret.screenjs.kubejs.BlockEntityMenuType;
+import net.minecraftforge.fluids.FluidStack;
 
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.function.Predicate;
 
 public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType<?>> {
     @FunctionalInterface
@@ -35,18 +30,14 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         void load(Level pLevel, BlockPos pPos, BlockEntityJS pBlockEntity, CompoundTag tag);
     }
 
-
-    public transient EntityBlockJS.Builder blockBuilder;
-    public transient MenuTypeBuilderWrapper menuTypeBuilder;
-    //public transient EntityBlockJS.Builder guiBuilder;
-
-
     public transient List<Block> validBlocks;
     public transient TickCallback tickCallback;
     public transient SaveCallback saveCallback;
     public transient LoadCallback loadCallback;
     public transient boolean hasGui;
-    public transient RecipeType<?> recipeType;
+    public transient ItemHandler itemHandler;
+    public transient EnergyHandler energyHandler;
+    public transient FluidHandler fluidHandler;
 
     public transient Map<String, Object> defaultValues;
 
@@ -54,16 +45,24 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
     public BlockEntityTypeBuilder(ResourceLocation i) {
         super(i);
         validBlocks = new ArrayList<>();
-        blockBuilder = getOrCreateBlockBuilder();
-        menuTypeBuilder = getOrCreateMenuBuilder();
+        //blockBuilder = getOrCreateBlockBuilder();
+        //menuTypeBuilder = getOrCreateMenuBuilder();
         tickCallback = null;
         saveCallback = null;
         loadCallback = null;
         hasGui = false;
-        recipeType = null;
+        itemHandler = null;
+        energyHandler = null;
+        fluidHandler = null;
         defaultValues = new HashMap<>();
     }
 
+    @Override
+    public final RegistryObjectBuilderTypes<BlockEntityType<?>> getRegistryType() {
+        return RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE;
+    }
+
+    /*
     @HideFromJS
     protected EntityBlockJS.Builder getOrCreateBlockBuilder() {
         return blockBuilder == null ? (blockBuilder = new EntityBlockJS.Builder(id).blockEntity(this)) : blockBuilder;
@@ -71,16 +70,12 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
 
     @HideFromJS
     protected MenuTypeBuilderWrapper getOrCreateMenuBuilder() {
-        if(ModList.get().isLoaded("screenjs")) {
+        if(Platform.isModLoaded("screenjs")) {
             return menuTypeBuilder == null ? (menuTypeBuilder = new MenuTypeBuilderWrapper(new BlockEntityMenuType.Builder(id))) : menuTypeBuilder;
         }
         return null;
     }
 
-    @Override
-    public final RegistryObjectBuilderTypes<BlockEntityType<?>> getRegistryType() {
-        return RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE;
-    }
 
     @Override
     public void createAdditionalObjects() {
@@ -96,6 +91,7 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         }
         return super.displayName(name);
     }
+    */
 
     public BlockEntityTypeBuilder addValidBlock(Block block) {
         this.validBlocks.add(block);
@@ -117,22 +113,34 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         return this;
     }
 
-    public BlockEntityTypeBuilder recipeType(RecipeType<?> type) {
-        this.recipeType = type;
-        return this;
-    }
-
     public BlockEntityTypeBuilder hasGui() {
-        if(!ModList.get().isLoaded("screenjs")) throw new IllegalStateException("Having a gui requires ScreenJS.");
+        if(!Platform.isModLoaded("screenjs")) throw new IllegalStateException("Having a gui requires ScreenJS.");
         hasGui = true;
         return this;
     }
 
-    public BlockEntityTypeBuilder addDefaultValue(String key, Object value) {
+    public BlockEntityTypeBuilder defaultValue(String key, Object value) {
         defaultValues.put(key, value);
+        KubeJS.LOGGER.debug(defaultValues.toString());
         return this;
     }
 
+    public BlockEntityTypeBuilder itemHandler(int capacity) {
+        this.itemHandler = new ItemHandler(capacity);
+        return this;
+    }
+
+    public BlockEntityTypeBuilder energyHandler(int capacity, int maxReceive, int maxExtract) {
+        this.energyHandler = new EnergyHandler(capacity, maxReceive, maxExtract);
+        return this;
+    }
+
+    public BlockEntityTypeBuilder fluidHandler(int capacity, Predicate<FluidStack> validator) {
+        this.fluidHandler = new FluidHandler(capacity, validator);
+        return this;
+    }
+
+    /*
     public BlockEntityTypeBuilder block(@Nullable Consumer<EntityBlockJS.Builder> i) {
         if (i == null) {
             blockBuilder = null;
@@ -142,12 +150,10 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
 
         return this;
     }
+    */
 
-    public static class MenuTypeBuilderWrapper {
-        public transient BlockEntityMenuType.Builder builder;
+    public record EnergyHandler(int capacity, int maxReceive, int maxExtract) {}
+    public record FluidHandler(int capacity, Predicate<FluidStack> validator) {}
+    public record ItemHandler(int capacity) {}
 
-        public MenuTypeBuilderWrapper(BlockEntityMenuType.Builder builder) {
-            this.builder = builder;
-        }
-    }
 }

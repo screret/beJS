@@ -1,5 +1,8 @@
 package screret.bejs.kubejs;
 
+import dev.architectury.platform.Platform;
+import dev.latvian.mods.kubejs.KubeJS;
+import dev.latvian.mods.kubejs.KubeJSRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
 import net.minecraft.network.chat.Component;
@@ -14,19 +17,17 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.registries.ForgeRegistries;
+import screret.screenjs.ScreenJSPlugin;
+import screret.screenjs.block.BlockEntityContainerMenu;
+import screret.screenjs.kubejs.BlockEntityMenuType;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class BlockEntityJS extends BlockEntity implements Nameable {
-    private final Builder builder;
+public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider {
+    public final Builder builder;
     private final ResourceLocation id;
-    private final MenuProvider menu;
 
     @Nullable
     private Component name;
@@ -38,38 +39,19 @@ public class BlockEntityJS extends BlockEntity implements Nameable {
     private final Map<String, Object> values;
 
     public BlockEntityJS(Builder builder, BlockPos pos, BlockState state) {
-        super(ForgeRegistries.BLOCK_ENTITY_TYPES.getValue(builder.id), pos, state);
+        super(KubeJSRegistries.blockEntities().get(builder.id), pos, state);
         this.builder = builder;
         this.id = builder.id;
-        this.menu = builder.hasGui ? new MenuProvider() {
-            @Override
-            public Component getDisplayName() {
-                return Component.translatable(builder.translationKey);
-            }
-
-            @Nullable
-            @Override
-            public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
-                //return new BlockEntity;
-                if(ModList.get().isLoaded("screenjs")) {
-                    return builder.menuTypeBuilder.builder.get().create(pContainerId, pPlayerInventory);
-                }
-                return null;
-            }
-        } : null;
         this.values = new HashMap<>();
         for(var kvp : builder.defaultValues.entrySet()) {
-            if(kvp.getValue() instanceof String str) this.values.put(kvp.getKey(), str);
-            else if(kvp.getValue() instanceof Integer _int) this.values.put(kvp.getKey(), _int);
-            else if(kvp.getValue() instanceof Long lng) this.values.put(kvp.getKey(), lng);
-            else if(kvp.getValue() instanceof Short shrt) this.values.put(kvp.getKey(), shrt);
-            else if(kvp.getValue() instanceof Boolean bool) this.values.put(kvp.getKey(), bool);
-            else if(kvp.getValue() instanceof Float flt) this.values.put(kvp.getKey(), flt);
+            var value = kvp.getValue();
+            if(value instanceof String str) this.values.put(kvp.getKey(), str);
+            else if(value instanceof Integer _int) this.values.put(kvp.getKey(), _int);
+            else if(value instanceof Long lng) this.values.put(kvp.getKey(), lng);
+            else if(value instanceof Short shrt) this.values.put(kvp.getKey(), shrt);
+            else if(value instanceof Boolean bool) this.values.put(kvp.getKey(), bool);
+            else if(value instanceof Float flt) this.values.put(kvp.getKey(), flt);
         }
-    }
-
-    public MenuProvider getMenuProvider() {
-        return menu;
     }
 
     public static <T extends BlockEntity> void serverTick(Level level, BlockPos pos, BlockState state, T t) {
@@ -87,7 +69,7 @@ public class BlockEntityJS extends BlockEntity implements Nameable {
 
         CompoundTag tag = new CompoundTag();
         for (var keyVal : getValues().entrySet()) {
-            if(keyVal.getValue() instanceof Integer ntgr) tag.putInt(keyVal.getKey(), ntgr);
+            if(keyVal.getValue() instanceof Integer _int) tag.putInt(keyVal.getKey(), _int);
             else if(keyVal.getValue() instanceof String str) tag.putString(keyVal.getKey(), str);
             else if(keyVal.getValue() instanceof Long lng) tag.putLong(keyVal.getKey(), lng);
             else if(keyVal.getValue() instanceof Short shrt) tag.putShort(keyVal.getKey(), shrt);
@@ -136,6 +118,15 @@ public class BlockEntityJS extends BlockEntity implements Nameable {
         return this.name != null ? this.name : Component.translatable(builder.translationKey);
     }
 
+    @Override
+    public boolean hasCustomName() {
+        return Nameable.super.hasCustomName();
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return getName();
+    }
 
     @Nullable
     public Component getCustomName() {
@@ -146,6 +137,16 @@ public class BlockEntityJS extends BlockEntity implements Nameable {
         this.name = pName;
     }
 
+    @Nullable
+    @Override
+    public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
+        if(Platform.isModLoaded("screenjs")) {
+            BlockEntityMenuType.Builder menu = (BlockEntityMenuType.Builder) ScreenJSPlugin.MENU_TYPE.objects.get(this.id);
+            return new BlockEntityContainerMenu(menu, pContainerId, pPlayerInventory, this);
+        }
+        return null;
+    }
+
     public static class Builder extends BlockEntityTypeBuilder {
         public Builder(ResourceLocation i) {
             super(i);
@@ -153,7 +154,7 @@ public class BlockEntityJS extends BlockEntity implements Nameable {
 
         @Override
         public BlockEntityType<?> createObject() {
-            return BlockEntityType.Builder.of((pPos, pState) -> new BlockEntityJS(Builder.this, pPos, pState), this.validBlocks.toArray(Block[]::new)).build(null);
+            return BlockEntityType.Builder.of((pPos, pState) -> new BlockEntityJS(this, pPos, pState), this.validBlocks.toArray(Block[]::new)).build(null);
         }
     }
 }

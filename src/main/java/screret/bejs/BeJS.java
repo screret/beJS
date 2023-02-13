@@ -1,56 +1,94 @@
 package screret.bejs;
 
-import com.mojang.logging.LogUtils;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
-import net.minecraftforge.api.distmarker.Dist;
+import dev.latvian.mods.kubejs.KubeJSRegistries;
+import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.InterModComms;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.EnergyStorage;
+import net.minecraftforge.energy.IEnergyStorage;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
-import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import org.slf4j.Logger;
+import screret.bejs.kubejs.BlockEntityJS;
+
+import javax.annotation.Nullable;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(BeJS.MODID)
 public class BeJS {
-
-    // Define mod id in a common place for everything to reference
     public static final String MODID = "bejs";
-    // Directly reference a slf4j logger
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     public BeJS() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        //IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        // Register the commonSetup method for modloading
-        modEventBus.addListener(this::commonSetup);
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
+        MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, this::attachCaps);
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event) {
-        // Some common setup code
-    }
+    private void attachCaps(final AttachCapabilitiesEvent<BlockEntity> event) {
+        if(event.getObject() instanceof BlockEntityJS beJs) {
+            BlockEntityJS.Builder builder = beJs.builder == null ? (BlockEntityJS.Builder) RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE.objects.get(KubeJSRegistries.blockEntities().getId(beJs.getType())) : beJs.builder;
+            if(builder.energyHandler != null) {
+                EnergyStorage backend = new EnergyStorage(builder.energyHandler.capacity(), builder.energyHandler.maxReceive(), builder.energyHandler.maxExtract());
+                LazyOptional<IEnergyStorage> optionalStorage = LazyOptional.of(() -> backend);
 
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        // Do something when the server starts
+                ICapabilityProvider provider = new ICapabilityProvider() {
+                    @Override
+                    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction direction) {
+                        if (cap == ForgeCapabilities.ENERGY) {
+                            return optionalStorage.cast();
+                        }
+                        return LazyOptional.empty();
+                    }
+                };
+
+                event.addCapability(new ResourceLocation(MODID, "energy_cap"), provider);
+            }
+
+            if(builder.itemHandler != null) {
+                ItemStackHandler backend = new ItemStackHandler(builder.itemHandler.capacity());
+                LazyOptional<IItemHandler> optionalStorage = LazyOptional.of(() -> backend);
+
+                ICapabilityProvider provider = new ICapabilityProvider() {
+                    @Override
+                    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction direction) {
+                        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+                            return optionalStorage.cast();
+                        }
+                        return LazyOptional.empty();
+                    }
+                };
+
+                event.addCapability(new ResourceLocation(MODID, "item_cap"), provider);
+            }
+
+            if(builder.fluidHandler != null) {
+                FluidTank backend = new FluidTank(builder.fluidHandler.capacity(), builder.fluidHandler.validator());
+                LazyOptional<IFluidHandler> optionalStorage = LazyOptional.of(() -> backend);
+
+                ICapabilityProvider provider = new ICapabilityProvider() {
+                    @Override
+                    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction direction) {
+                        if (cap == ForgeCapabilities.FLUID_HANDLER) {
+                            return optionalStorage.cast();
+                        }
+                        return LazyOptional.empty();
+                    }
+                };
+
+                event.addCapability(new ResourceLocation(MODID, "fluid_cap"), provider);
+            }
+        }
     }
 }
