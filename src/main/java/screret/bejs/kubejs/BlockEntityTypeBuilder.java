@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType<?>> {
@@ -39,7 +40,11 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
     public transient EnergyHandler energyHandler;
     public transient FluidHandler fluidHandler;
 
-    public transient Map<String, Object> defaultValues;
+    /**
+     * allowed keys: "progress":int, "totalProgress":int, "isProcessing":boolean, "fuelDuration":int, "remainingFuel":int
+     * other keys are also allowed, but not used by default
+     */
+    public transient Consumer<CompoundTag> defaultValues;
 
 
     public BlockEntityTypeBuilder(ResourceLocation i) {
@@ -54,7 +59,7 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         itemHandler = null;
         energyHandler = null;
         fluidHandler = null;
-        defaultValues = new HashMap<>();
+        defaultValues = null;
     }
 
     @Override
@@ -119,9 +124,13 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         return this;
     }
 
-    public BlockEntityTypeBuilder defaultValue(String key, Object value) {
-        defaultValues.put(key, value);
-        KubeJS.LOGGER.debug(defaultValues.toString());
+
+    /**
+     * allowed (used) keys: "progress":int, "totalProgress":int, "isProcessing":boolean, "fuelDuration":int, "remainingFuel":int
+     * other keys are also allowed, but not used by default
+     */
+    public BlockEntityTypeBuilder defaultValues(Consumer<CompoundTag> consumer) {
+        defaultValues = consumer;
         return this;
     }
 
@@ -139,18 +148,6 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         this.fluidHandler = new FluidHandler(capacity, validator);
         return this;
     }
-
-    /*
-    public BlockEntityTypeBuilder block(@Nullable Consumer<EntityBlockJS.Builder> i) {
-        if (i == null) {
-            blockBuilder = null;
-        } else {
-            i.accept(getOrCreateBlockBuilder());
-        }
-
-        return this;
-    }
-    */
 
     public record EnergyHandler(int capacity, int maxReceive, int maxExtract) {}
     public record FluidHandler(int capacity, Predicate<FluidStack> validator) {}

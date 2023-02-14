@@ -45,13 +45,14 @@ public class EntityBlockJS extends BasicBlockJS {
 
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
-        if(!pLevel.isClientSide) {
-            if(builder.hasGui) {
-                if(pLevel.getBlockEntity(pPos) instanceof BlockEntityJS blockEntityJS) {
-                    NetworkHooks.openScreen((ServerPlayer) pPlayer, blockEntityJS, pPos);
-                    //pPlayer.openMenu(blockEntityJS);
-                    return InteractionResult.SUCCESS;
-                }
+        if(pLevel.isClientSide) {
+            return InteractionResult.SUCCESS;
+        }
+        if(builder.hasGui) {
+            if(pLevel.getBlockEntity(pPos) instanceof BlockEntityJS blockEntityJS) {
+                NetworkHooks.openScreen((ServerPlayer) pPlayer, blockEntityJS, pPos);
+                //pPlayer.openMenu(blockEntityJS);
+                return InteractionResult.CONSUME;
             }
         }
         return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
@@ -67,10 +68,12 @@ public class EntityBlockJS extends BasicBlockJS {
 
         public Builder(ResourceLocation i) {
             super(i);
+            blockEntityTypeBuilder = getOrCreateBlockEntityTypeBuilder();
         }
 
         @Override
         public void createAdditionalObjects() {
+            super.createAdditionalObjects();
             if (blockEntityTypeBuilder != null) {
                 RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE.addBuilder(blockEntityTypeBuilder);
             }
