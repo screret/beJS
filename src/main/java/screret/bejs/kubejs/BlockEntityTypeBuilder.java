@@ -1,5 +1,6 @@
 package screret.bejs.kubejs;
 
+import com.prunoideae.powerfuljs.CapabilityBuilder;
 import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.BuilderBase;
 import dev.latvian.mods.kubejs.KubeJS;
@@ -9,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.FluidStack;
@@ -40,6 +42,7 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
     public transient EnergyHandler energyHandler;
     public transient FluidHandler fluidHandler;
 
+    public transient List<CapabilityBuilder<BlockEntity, ?, ?>> capabilityBuilders;
     /**
      * allowed keys: "progress":int, "totalProgress":int, "isProcessing":boolean, "fuelDuration":int, "remainingFuel":int
      * other keys are also allowed, but not used by default
@@ -59,6 +62,8 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         itemHandler = null;
         energyHandler = null;
         fluidHandler = null;
+
+        capabilityBuilders = new ArrayList<>();
         defaultValues = null;
     }
 
@@ -146,6 +151,11 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
 
     public BlockEntityTypeBuilder fluidHandler(int capacity, Predicate<FluidStack> validator) {
         this.fluidHandler = new FluidHandler(capacity, validator);
+        return this;
+    }
+
+    public BlockEntityTypeBuilder attachCapability(CapabilityBuilder<BlockEntity, ?, ?> capabilityBuilder) {
+        this.capabilityBuilders.add(capabilityBuilder);
         return this;
     }
 

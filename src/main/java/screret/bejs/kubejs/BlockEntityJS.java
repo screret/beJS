@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import screret.screenjs.ScreenJS;
 import screret.screenjs.ScreenJSPlugin;
 import screret.screenjs.block.BlockEntityContainerMenu;
 import screret.screenjs.kubejs.BlockEntityMenuType;
@@ -38,7 +37,7 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
         this.id = builder.id;
     }
 
-    public static <T extends BlockEntity> void serverTick(Level level, BlockPos pos, BlockState state, T t) {
+    public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T t) {
         if(t instanceof BlockEntityJS blockEntity) {
             blockEntity.builder.tickCallback.tick(level, pos, state, blockEntity);
         } else {
@@ -107,7 +106,7 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
         }
 
         @Override
-        public BlockEntityType<?> createObject() {
+        public BlockEntityType<BlockEntityJS> createObject() {
             return BlockEntityType.Builder.of((pPos, pState) -> new BlockEntityJS(this, pPos, pState), this.validBlocks.toArray(Block[]::new)).build(null);
         }
     }

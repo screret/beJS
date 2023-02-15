@@ -1,1 +1,1 @@
-screret.bejs.BEJSPlugin bejs
+screret.bejs.BEJSPlugin

@@ -6,22 +6,32 @@ import dev.latvian.mods.kubejs.block.BlockBuilder;
 import dev.latvian.mods.kubejs.block.custom.BasicBlockJS;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class EntityBlockJS extends BasicBlockJS {
@@ -40,7 +50,7 @@ public class EntityBlockJS extends BasicBlockJS {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-        return level.isClientSide ? null : BlockEntityJS::serverTick;
+        return BlockEntityJS::tick;
     }
 
     @Override
@@ -61,6 +71,30 @@ public class EntityBlockJS extends BasicBlockJS {
     @Override
     public MenuProvider getMenuProvider(BlockState pState, Level pLevel, BlockPos pPos) {
         return pLevel.getBlockEntity(pPos) instanceof BlockEntityJS blockEntityJS ? blockEntityJS : null;
+    }
+
+    @Override
+    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+        if (!pState.is(pNewState.getBlock())) {
+            BlockEntity blockentity = pLevel.getBlockEntity(pPos);
+            if (blockentity instanceof BlockEntityJS blockEntityJS && !pLevel.isClientSide) {
+                Set<IItemHandler> oldHandlers = new HashSet<>();
+
+                for (Direction dir : Direction.values()) {
+                    IItemHandler itemHandler = blockEntityJS.getCapability(ForgeCapabilities.ITEM_HANDLER, dir).orElse(null);
+                    if(itemHandler != null && !oldHandlers.contains(itemHandler)) {
+                        oldHandlers.add(itemHandler);
+                        for (int i = 0; i < itemHandler.getSlots(); ++i) {
+                            Containers.dropItemStack(pLevel, pPos.getX() + 0.5, pPos.getY() + 0.5, pPos.getZ() + 0.5, itemHandler.getStackInSlot(i));
+                        }
+                    }
+                }
+
+                pLevel.updateNeighbourForOutputSignal(pPos, this);
+            }
+
+            super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
+        }
     }
 
     public static class Builder extends BlockBuilder {

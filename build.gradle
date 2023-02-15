@@ -184,6 +184,7 @@ dependencies {
 
     implementation fg.deobf("screret.screenjs:screenjs:1.19.2-1.0.0")
 
+    implementation fg.deobf("curse.maven:powerfuljs-819845:4395615")
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
