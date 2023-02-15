@@ -126,7 +126,7 @@ public class EntityBlockJS extends BasicBlockJS {
             return super.displayName(name);
         }
 
-        public BlockBuilder entity(@Nullable Consumer<BlockEntityTypeBuilder> i) {
+        public Builder entity(@Nullable Consumer<BlockEntityTypeBuilder> i) {
             if (i == null) {
                 blockEntityTypeBuilder = null;
                 lootTable = null;
@@ -136,6 +136,13 @@ public class EntityBlockJS extends BasicBlockJS {
 
             return this;
         }
+
+        /*
+        public Builder entity(ResourceLocation blockEntityId) {
+            this.blockEntityTypeBuilder = (BlockEntityTypeBuilder) RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE.objects.get(blockEntityId);
+            return this;
+        }
+        */
 
         @Override
         public Block createObject() {

@@ -27,7 +27,7 @@ license = "GNU GPL 3.0"
     # A URL for the "homepage" for this mod, displayed in the mod UI
     #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
     # A file name (in the root of the mod JAR) containing a logo for display
-    #logoFile="beJS.png" #optional
+    logoFile="logo.png" #optional
     # A text field displayed in the mod UI
     #credits="Thanks for this example mod goes to Java" #optional
     # A text field displayed in the mod UI
@@ -65,9 +65,23 @@ license = "GNU GPL 3.0"
         ordering = "NONE"
         side = "BOTH"
     [[dependencies.bejs]]
+        modId = "kubejs"
+        mandatory = true
+        # This version range declares a minimum of the current minecraft version up to but not including the next major version
+        versionRange = "[1902.6.0-build.142,)"
+        ordering = "NONE"
+        side = "BOTH"
+    [[dependencies.bejs]]
         modId = "screenjs"
         mandatory = false
         # This version range declares a minimum of the current minecraft version up to but not including the next major version
         versionRange = "[1.19.2-1.0.0,)"
         ordering = "BEFORE"
+        side = "BOTH"
+    [[dependencies.bejs]]
+        modId = "powerfuljs"
+        mandatory = false
+        # This version range declares a minimum of the current minecraft version up to but not including the next major version
+        versionRange = "[1.1.0,)"
+        ordering = "AFTER"
         side = "BOTH"

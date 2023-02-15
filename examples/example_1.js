@@ -13,7 +13,7 @@ StartupEvents.registry('block', event => {
                         level.setBlock(pos.above(), Blocks.AIR.defaultBlockState(), 3)
                     }
                 }
-                BE_LOGGER.info('aaa aaa')
+                BE_LOGGER.info('aaa aaa') // Send a line into the beJS logger, don't see a need for this tbf
             }
     	}).saveCallback((level, pos, be, tag) => { // called on BlockEntity save, don't see why you would ever need these tbf, but they're here
             tag.putInt("tagValueAa", be.getPersistentData().getInt('progress'))
@@ -29,5 +29,5 @@ StartupEvents.registry('block', event => {
                                           // [1st param: max energy, 2nd param: max input, 3rd param: max output]
         .fluidHandler(1000, stack => true) // adds a basic fluid handler
               	                                   // [1st param: max amount, 2nd param: fluid filter]
-          	})
+    })
 })
