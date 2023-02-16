@@ -39,9 +39,7 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T t) {
         if(t instanceof BlockEntityJS blockEntity) {
-            if(blockEntity.builder.tickCallback != null) {
-                blockEntity.builder.tickCallback.tick(level, pos, state, blockEntity);
-            }
+            blockEntity.builder.tickCallback.tick(level, pos, state, blockEntity);
         } else {
             throw new IllegalStateException("T was not an instance of BlockEntityJS");
         }

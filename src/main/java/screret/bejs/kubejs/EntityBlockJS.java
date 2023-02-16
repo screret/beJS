@@ -50,7 +50,7 @@ public class EntityBlockJS extends BasicBlockJS {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> blockEntityType) {
-        return BlockEntityJS::tick;
+        return builder.tickCallback != null ? BlockEntityJS::tick : null;
     }
 
     @Override

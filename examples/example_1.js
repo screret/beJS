@@ -5,15 +5,18 @@ StartupEvents.registry('block', event => {
 	event.create('example_block', 'entity' /*has to be here for the BE builder to work*/).material('wood').hardness(1.0).displayName('Example Block')
 	.entity(builder => { // adds a BlockEntity onto this block
 	    builder.ticker((level, pos, state, be) => { // a tick method, called on block entity tick
-            if(!level.isClientSide) { // ALWAYS check side, the tick method is called on both CLIENT and SERVER
-                if(level.getGameTime() % 20 === 0) {
+            if(!level.clientSide) { // ALWAYS check side, the tick method is called on both CLIENT and SERVER
+                if(level.levelData.gameTime % 20 == 0) {
                     if(level.getBlockState(pos.above()) === Blocks.AIR.defaultBlockState()) {
-                        level.setBlock(pos.above(),Blocks.GLASS.defaultBlockState(), 3)
+                        level.setBlock(pos.above(), Blocks.GLASS.defaultBlockState(), 3)
                     } else {
                         level.setBlock(pos.above(), Blocks.AIR.defaultBlockState(), 3)
                     }
                 }
-                BE_LOGGER.info('aaa aaa') // Send a line into the beJS logger, don't see a need for this tbf
+                /*if(level.getBlockState(pos.above()) == Blocks.AIR.defaultBlockState()) {
+                    level.setBlock(pos.above(), Blocks.GLASS.defaultBlockState(), 3)
+                }*/
+                //console.info('AAAAA IT BROKEN')
             }
     	}).saveCallback((level, pos, be, tag) => { // called on BlockEntity save, don't see why you would ever need these tbf, but they're here
             tag.putInt("tagValueAa", be.getPersistentData().getInt('progress'))
@@ -28,6 +31,6 @@ StartupEvents.registry('block', event => {
         .energyHandler(10000, 1000, 1000) // adds a basic FE handler, same as above
                                           // [1st param: max energy, 2nd param: max input, 3rd param: max output]
         .fluidHandler(1000, stack => true) // adds a basic fluid handler
-              	                                   // [1st param: max amount, 2nd param: fluid filter]
+              	                           // [1st param: max amount, 2nd param: fluid filter]
     })
 })
