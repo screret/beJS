@@ -39,7 +39,9 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T t) {
         if(t instanceof BlockEntityJS blockEntity) {
-            blockEntity.builder.tickCallback.tick(level, pos, state, blockEntity);
+            if(blockEntity.builder.tickCallback != null) {
+                blockEntity.builder.tickCallback.tick(level, pos, state, blockEntity);
+            }
         } else {
             throw new IllegalStateException("T was not an instance of BlockEntityJS");
         }
@@ -48,8 +50,9 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         super.saveAdditional(pTag);
-        builder.saveCallback.saveAdditional(this.level, this.worldPosition, this, pTag);
-
+        if(builder.saveCallback != null) {
+            builder.saveCallback.saveAdditional(this.level, this.worldPosition, this, pTag);
+        }
 
         if (this.name != null) {
             pTag.putString("CustomName", Component.Serializer.toJson(this.name));
@@ -59,7 +62,9 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
     @Override
     public void load(CompoundTag pTag) {
         super.load(pTag);
-        builder.loadCallback.load(this.level, this.worldPosition, this, pTag);
+        if(builder.loadCallback != null) {
+            builder.loadCallback.load(this.level, this.worldPosition, this, pTag);
+        }
 
         if (pTag.contains("CustomName", Tag.TAG_STRING)) {
             this.name = Component.Serializer.fromJson(pTag.getString("CustomName"));
@@ -95,7 +100,9 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
     public AbstractContainerMenu createMenu(int windowId, Inventory playerInv, Player pPlayer) {
         if(Platform.isModLoaded("screenjs")) {
             BlockEntityMenuType.Builder menu = (BlockEntityMenuType.Builder) ScreenJSPlugin.MENU_TYPE.objects.get(this.id);
-            return new BlockEntityContainerMenu(menu, windowId, playerInv, this);
+            if(menu != null) {
+                return new BlockEntityContainerMenu(menu, windowId, playerInv, this);
+            }
         }
         return null;
     }
