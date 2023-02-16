@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import screret.screenjs.ScreenJSPlugin;
-import screret.screenjs.block.BlockEntityContainerMenu;
+import screret.screenjs.common.BlockEntityContainerMenu;
 import screret.screenjs.kubejs.BlockEntityMenuType;
 
 import javax.annotation.Nullable;
@@ -31,7 +31,7 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
     private Component name;
 
     public BlockEntityJS(Builder builder, BlockPos pos, BlockState state) {
-        super(KubeJSRegistries.blockEntities().get(builder.id), pos, state);
+        super(builder.get(), pos, state);
         builder.defaultValues.accept(this.getPersistentData());
         this.builder = builder;
         this.id = builder.id;
