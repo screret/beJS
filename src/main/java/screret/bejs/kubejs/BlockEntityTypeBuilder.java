@@ -1,6 +1,5 @@
 package screret.bejs.kubejs;
 
-import com.prunoideae.powerfuljs.CapabilityBuilder;
 import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.BuilderBase;
 import dev.latvian.mods.kubejs.KubeJS;
@@ -42,7 +41,7 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
     public transient EnergyHandler energyHandler;
     public transient FluidHandler fluidHandler;
 
-    public transient List<CapabilityBuilder<BlockEntity, ?, ?>> capabilityBuilders;
+    //public transient List<CapabilityBuilder<BlockEntity, ?, ?>> capabilityBuilders;
     /**
      * allowed keys: "progress":int, "totalProgress":int, "isProcessing":boolean, "fuelDuration":int, "remainingFuel":int
      * other keys are also allowed, but not used by default
@@ -63,7 +62,7 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         energyHandler = null;
         fluidHandler = null;
 
-        capabilityBuilders = new ArrayList<>();
+        //capabilityBuilders = new ArrayList<>();
         defaultValues = null;
     }
 
@@ -154,10 +153,12 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         return this;
     }
 
+    /*
     public BlockEntityTypeBuilder attachCapability(CapabilityBuilder<BlockEntity, ?, ?> capabilityBuilder) {
         this.capabilityBuilders.add(capabilityBuilder);
         return this;
     }
+     */
 
     public record EnergyHandler(int capacity, int maxReceive, int maxExtract) {}
     public record FluidHandler(int capacity, Predicate<FluidStack> validator) {}

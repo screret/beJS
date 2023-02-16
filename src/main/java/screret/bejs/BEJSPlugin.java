@@ -1,6 +1,5 @@
 package screret.bejs;
 
-import com.prunoideae.powerfuljs.CapabilityService;
 import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.KubeJSRegistries;
@@ -20,9 +19,10 @@ public class BEJSPlugin extends KubeJSPlugin {
 
     @Override
     public void registerBindings(BindingsEvent event) {
-        event.add("BE_LOGGER", BeJS.LOGGER);
+        //event.add("BE_LOGGER", BeJS.LOGGER);
     }
 
+    /*
     @Override
     public void afterInit() {
         if(Platform.isModLoaded("powerfuljs")) {
@@ -34,4 +34,5 @@ public class BEJSPlugin extends KubeJSPlugin {
             }
         }
     }
+     */
 }

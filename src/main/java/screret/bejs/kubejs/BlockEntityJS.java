@@ -106,11 +106,6 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
         }
 
         @Override
-        public BlockEntityTypeBuilder ticker(TickCallback ticker) {
-            return super.ticker(ticker);
-        }
-
-        @Override
         public BlockEntityType<BlockEntityJS> createObject() {
             return BlockEntityType.Builder.of((pPos, pState) -> new BlockEntityJS(this, pPos, pState), this.validBlocks.toArray(Block[]::new)).build(null);
         }
