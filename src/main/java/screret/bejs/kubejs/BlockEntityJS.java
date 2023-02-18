@@ -1,11 +1,11 @@
 package screret.bejs.kubejs;
 
 import dev.architectury.platform.Platform;
-import dev.latvian.mods.kubejs.KubeJSRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
@@ -67,6 +67,17 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
         if (pTag.contains("CustomName", Tag.TAG_STRING)) {
             this.name = Component.Serializer.fromJson(pTag.getString("CustomName"));
         }
+
+    }
+
+    public CompoundTag getUpdateTag() {
+        return this.saveWithFullMetadata();
+    }
+
+    @Nullable
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
@@ -104,6 +115,7 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
         }
         return null;
     }
+
 
     public static class Builder extends BlockEntityTypeBuilder {
         public Builder(ResourceLocation i) {

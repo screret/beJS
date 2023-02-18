@@ -62,10 +62,7 @@ public class BeJS {
 
                     @Override
                     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction direction) {
-                        if (cap == ForgeCapabilities.ENERGY) {
-                            return optionalStorage.cast();
-                        }
-                        return LazyOptional.empty();
+                        return ForgeCapabilities.ENERGY.orEmpty(cap, optionalStorage);
                     }
                 };
 
@@ -89,10 +86,7 @@ public class BeJS {
 
                     @Override
                     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction direction) {
-                        if (cap == ForgeCapabilities.ITEM_HANDLER) {
-                            return optionalStorage.cast();
-                        }
-                        return LazyOptional.empty();
+                        return ForgeCapabilities.ITEM_HANDLER.orEmpty(cap, optionalStorage);
                     }
                 };
 
@@ -116,10 +110,7 @@ public class BeJS {
 
                     @Override
                     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction direction) {
-                        if (cap == ForgeCapabilities.FLUID_HANDLER) {
-                            return optionalStorage.cast();
-                        }
-                        return LazyOptional.empty();
+                        return ForgeCapabilities.FLUID_HANDLER.orEmpty(cap, optionalStorage);
                     }
                 };
 
