@@ -33,8 +33,6 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
 
     public transient List<Block> validBlocks;
     public transient TickCallback tickCallback;
-    public transient SaveCallback saveCallback;
-    public transient LoadCallback loadCallback;
     public transient boolean hasGui;
     public transient ItemHandler itemHandler;
     public transient EnergyHandler energyHandler;
@@ -51,17 +49,12 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
     public BlockEntityTypeBuilder(ResourceLocation i) {
         super(i);
         validBlocks = new ArrayList<>();
-        //blockBuilder = getOrCreateBlockBuilder();
-        //menuTypeBuilder = getOrCreateMenuBuilder();
         tickCallback = null;
-        saveCallback = null;
-        loadCallback = null;
         hasGui = false;
         itemHandler = null;
         energyHandler = null;
         fluidHandler = null;
 
-        //capabilityBuilders = new ArrayList<>();
         defaultValues = null;
     }
 
@@ -70,37 +63,6 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         return RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE;
     }
 
-    /*
-    @HideFromJS
-    protected EntityBlockJS.Builder getOrCreateBlockBuilder() {
-        return blockBuilder == null ? (blockBuilder = new EntityBlockJS.Builder(id).blockEntity(this)) : blockBuilder;
-    }
-
-    @HideFromJS
-    protected MenuTypeBuilderWrapper getOrCreateMenuBuilder() {
-        if(Platform.isModLoaded("screenjs")) {
-            return menuTypeBuilder == null ? (menuTypeBuilder = new MenuTypeBuilderWrapper(new BlockEntityMenuType.Builder(id))) : menuTypeBuilder;
-        }
-        return null;
-    }
-
-
-    @Override
-    public void createAdditionalObjects() {
-        if (blockBuilder != null) {
-            RegistryObjectBuilderTypes.BLOCK.addBuilder(blockBuilder);
-        }
-    }
-
-    @Override
-    public BuilderBase<BlockEntityType<?>> displayName(String name) {
-        if (blockBuilder != null) {
-            blockBuilder.displayName(name);
-        }
-        return super.displayName(name);
-    }
-    */
-
     public BlockEntityTypeBuilder addValidBlock(Block block) {
         this.validBlocks.add(block);
         return this;
@@ -108,16 +70,6 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
 
     public BlockEntityTypeBuilder ticker(TickCallback ticker) {
         this.tickCallback = ticker;
-        return this;
-    }
-
-    public BlockEntityTypeBuilder loadCallback(LoadCallback ticker) {
-        this.loadCallback = ticker;
-        return this;
-    }
-
-    public BlockEntityTypeBuilder saveCallback(SaveCallback ticker) {
-        this.saveCallback = ticker;
         return this;
     }
 

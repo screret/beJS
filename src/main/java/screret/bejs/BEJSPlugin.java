@@ -1,13 +1,10 @@
 package screret.bejs;
 
-import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.KubeJSPlugin;
-import dev.latvian.mods.kubejs.KubeJSRegistries;
 import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import screret.bejs.kubejs.BlockEntityJS;
-import screret.bejs.kubejs.BlockEntityTypeBuilder;
 import screret.bejs.kubejs.EntityBlockJS;
 
 public class BEJSPlugin extends KubeJSPlugin {

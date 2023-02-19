@@ -32,7 +32,8 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
 
     public BlockEntityJS(Builder builder, BlockPos pos, BlockState state) {
         super(builder.get(), pos, state);
-        builder.defaultValues.accept(this.getPersistentData());
+        if(builder.defaultValues != null)
+            builder.defaultValues.accept(this.getPersistentData());
         this.builder = builder;
         this.id = builder.id;
     }
@@ -48,9 +49,6 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         super.saveAdditional(pTag);
-        if(builder.saveCallback != null) {
-            builder.saveCallback.saveAdditional(this.level, this.worldPosition, this, pTag);
-        }
 
         if (this.name != null) {
             pTag.putString("CustomName", Component.Serializer.toJson(this.name));
@@ -60,9 +58,6 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
     @Override
     public void load(CompoundTag pTag) {
         super.load(pTag);
-        if(builder.loadCallback != null) {
-            builder.loadCallback.load(this.level, this.worldPosition, this, pTag);
-        }
 
         if (pTag.contains("CustomName", Tag.TAG_STRING)) {
             this.name = Component.Serializer.fromJson(pTag.getString("CustomName"));
