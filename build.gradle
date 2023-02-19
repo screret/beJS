@@ -182,7 +182,7 @@ dependencies {
     implementation fg.deobf("dev.latvian.mods:rhino-forge:${rhino_version}")
     implementation fg.deobf("dev.architectury:architectury-forge:${architectury_version}")
 
-    implementation fg.deobf("screret.screenjs:screenjs:1.19.2-1.0.2")
+    implementation fg.deobf("screret.screenjs:screenjs:1.19.2-1.0.5")
 
     //implementation fg.deobf("curse.maven:powerfuljs-819845:4395615")
 

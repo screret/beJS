@@ -22,18 +22,10 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
     public interface TickCallback {
         void tick(Level pLevel, BlockPos pPos, BlockState pState, BlockEntityJS pBlockEntity);
     }
-    @FunctionalInterface
-    public interface SaveCallback {
-        void saveAdditional(Level pLevel, BlockPos pPos, BlockEntityJS pBlockEntity, CompoundTag tag);
-    }
-    @FunctionalInterface
-    public interface LoadCallback {
-        void load(Level pLevel, BlockPos pPos, BlockEntityJS pBlockEntity, CompoundTag tag);
-    }
 
     public transient List<Block> validBlocks;
     public transient TickCallback tickCallback;
-    public transient boolean hasGui;
+    //public transient boolean hasGui;
     public transient ItemHandler itemHandler;
     public transient EnergyHandler energyHandler;
     public transient FluidHandler fluidHandler;
@@ -50,7 +42,7 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         super(i);
         validBlocks = new ArrayList<>();
         tickCallback = null;
-        hasGui = false;
+        //hasGui = false;
         itemHandler = null;
         energyHandler = null;
         fluidHandler = null;
@@ -73,11 +65,11 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         return this;
     }
 
-    public BlockEntityTypeBuilder hasGui() {
+    /*public BlockEntityTypeBuilder hasGui() {
         if(!Platform.isModLoaded("screenjs")) throw new IllegalStateException("Having a gui requires ScreenJS.");
         hasGui = true;
         return this;
-    }
+    }*/
 
 
     /**

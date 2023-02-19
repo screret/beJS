@@ -53,7 +53,7 @@ public class EntityBlockJS extends BasicBlockJS {
         return builder.tickCallback != null ? BlockEntityJS::tick : null;
     }
 
-    @Override
+    /*@Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         if(pLevel.isClientSide) {
             return InteractionResult.SUCCESS;
@@ -71,7 +71,7 @@ public class EntityBlockJS extends BasicBlockJS {
     @Override
     public MenuProvider getMenuProvider(BlockState pState, Level pLevel, BlockPos pPos) {
         return pLevel.getBlockEntity(pPos) instanceof BlockEntityJS blockEntityJS ? blockEntityJS : null;
-    }
+    }*/
 
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {

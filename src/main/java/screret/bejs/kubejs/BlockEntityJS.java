@@ -1,29 +1,22 @@
 package screret.bejs.kubejs;
 
-import dev.architectury.platform.Platform;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.Nameable;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import screret.screenjs.ScreenJSPlugin;
-import screret.screenjs.common.BlockEntityContainerMenu;
-import screret.screenjs.kubejs.BlockEntityMenuType;
+import screret.bejs.BeJS;
 
 import javax.annotation.Nullable;
 
-public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider {
+public class BlockEntityJS extends BlockEntity implements Nameable {
     public final Builder builder;
     private final ResourceLocation id;
 
@@ -40,7 +33,11 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
 
     public static <T extends BlockEntity> void tick(Level level, BlockPos pos, BlockState state, T t) {
         if(t instanceof BlockEntityJS blockEntity) {
-            blockEntity.builder.tickCallback.tick(level, pos, state, blockEntity);
+            try {
+                blockEntity.builder.tickCallback.tick(level, pos, state, blockEntity);
+            } catch (Exception exception) {
+                BeJS.LOGGER.error("beJS tick error!:", exception);
+            }
         } else {
             throw new IllegalStateException("T was not an instance of BlockEntityJS");
         }
@@ -97,18 +94,6 @@ public class BlockEntityJS extends BlockEntity implements Nameable, MenuProvider
 
     public void setCustomName(Component pName) {
         this.name = pName;
-    }
-
-    @Nullable
-    @Override
-    public AbstractContainerMenu createMenu(int windowId, Inventory playerInv, Player pPlayer) {
-        if(Platform.isModLoaded("screenjs")) {
-            BlockEntityMenuType.Builder menu = (BlockEntityMenuType.Builder) ScreenJSPlugin.MENU_TYPE.objects.get(this.id);
-            if(menu != null) {
-                return new BlockEntityContainerMenu(menu, windowId, playerInv, this);
-            }
-        }
-        return null;
     }
 
 
