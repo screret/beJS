@@ -21,11 +21,11 @@ license = "GNU GPL 3.0"
     # see the associated build.gradle script for how to populate this completely automatically during a build
     version = "${file.jarVersion}" #mandatory
     # A display name for the mod
-    displayName = "BeJS" #mandatory
+    displayName = "beJS" #mandatory
     # A URL to query for updates for this mod. See the JSON update specification https://docs.minecraftforge.net/en/latest/misc/updatechecker/
-    #updateJSONURL="https://change.me.example.invalid/updates.json" #optional
+    updateJSONURL="https://raw.githubusercontent.com/screret/beJS/master/updates.json" #optional
     # A URL for the "homepage" for this mod, displayed in the mod UI
-    #displayURL="https://change.me.to.your.mods.homepage.example.invalid/" #optional
+    displayURL="https://www.curseforge.com/minecraft/mc-mods/bejs" #optional
     # A file name (in the root of the mod JAR) containing a logo for display
     logoFile="logo.png" #optional
     # A text field displayed in the mod UI
@@ -75,13 +75,6 @@ license = "GNU GPL 3.0"
         modId = "screenjs"
         mandatory = false
         # This version range declares a minimum of the current minecraft version up to but not including the next major version
-        versionRange = "[1.19.2-1.0.0,)"
+        versionRange = "[1.19.2-1.0.5,)"
         ordering = "BEFORE"
-        side = "BOTH"
-    [[dependencies.bejs]]
-        modId = "powerfuljs"
-        mandatory = false
-        # This version range declares a minimum of the current minecraft version up to but not including the next major version
-        versionRange = "[1.1.0,)"
-        ordering = "AFTER"
         side = "BOTH"
