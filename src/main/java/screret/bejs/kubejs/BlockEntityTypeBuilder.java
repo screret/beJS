@@ -1,6 +1,5 @@
 package screret.bejs.kubejs;
 
-import dev.architectury.platform.Platform;
 import dev.latvian.mods.kubejs.BuilderBase;
 import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
 import net.minecraft.core.BlockPos;
@@ -26,13 +25,13 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
     public transient List<Block> validBlocks;
     public transient TickCallback tickCallback;
     //public transient boolean hasGui;
-    public transient ItemHandler itemHandler;
+    public transient List<ItemHandler> itemHandlers;
     public transient EnergyHandler energyHandler;
-    public transient FluidHandler fluidHandler;
+    public transient List<FluidHandler> fluidHandlers;
 
     //public transient List<CapabilityBuilder<BlockEntity, ?, ?>> capabilityBuilders;
     /**
-     * allowed keys: "progress":int, "totalProgress":int, "isProcessing":boolean, "fuelDuration":int, "remainingFuel":int
+     * allowed keys: "progress":int, "totalProgress":int, "fuelDuration":int, "remainingFuel":int
      * other keys are also allowed, but not used by default
      */
     public transient Consumer<CompoundTag> defaultValues;
@@ -43,9 +42,9 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         validBlocks = new ArrayList<>();
         tickCallback = null;
         //hasGui = false;
-        itemHandler = null;
+        itemHandlers = new ArrayList<>();
         energyHandler = null;
-        fluidHandler = null;
+        fluidHandlers = new ArrayList<>();
 
         defaultValues = null;
     }
@@ -73,7 +72,7 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
 
 
     /**
-     * allowed (used) keys: "progress":int, "totalProgress":int, "isProcessing":boolean, "fuelDuration":int, "remainingFuel":int
+     * allowed (used) keys: "progress":int, "totalProgress":int, "fuelDuration":int, "remainingFuel":int
      * other keys are also allowed, but not used by default
      */
     public BlockEntityTypeBuilder defaultValues(Consumer<CompoundTag> consumer) {
@@ -82,7 +81,7 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
     }
 
     public BlockEntityTypeBuilder itemHandler(int capacity) {
-        this.itemHandler = new ItemHandler(capacity);
+        this.itemHandlers.add(new ItemHandler(capacity));
         return this;
     }
 
@@ -91,8 +90,13 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
         return this;
     }
 
+    public BlockEntityTypeBuilder fluidHandler(int capacity) {
+        this.fluidHandlers.add(new FluidHandler(capacity, stack -> true));
+        return this;
+    }
+
     public BlockEntityTypeBuilder fluidHandler(int capacity, Predicate<FluidStack> validator) {
-        this.fluidHandler = new FluidHandler(capacity, validator);
+        this.fluidHandlers.add(new FluidHandler(capacity, validator));
         return this;
     }
 

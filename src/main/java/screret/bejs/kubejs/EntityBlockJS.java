@@ -29,6 +29,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
+import screret.bejs.misc.IMultipleItemHandler;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -84,8 +85,16 @@ public class EntityBlockJS extends BasicBlockJS {
                     IItemHandler itemHandler = blockEntityJS.getCapability(ForgeCapabilities.ITEM_HANDLER, dir).orElse(null);
                     if(itemHandler != null && !oldHandlers.contains(itemHandler)) {
                         oldHandlers.add(itemHandler);
-                        for (int i = 0; i < itemHandler.getSlots(); ++i) {
-                            Containers.dropItemStack(pLevel, pPos.getX() + 0.5, pPos.getY() + 0.5, pPos.getZ() + 0.5, itemHandler.getStackInSlot(i));
+                        if(itemHandler instanceof IMultipleItemHandler multipleItemHandler) {
+                            for (var container : multipleItemHandler.getAllContainers()) {
+                                for (int i = 0; i < container.getSlots(); ++i) {
+                                    Containers.dropItemStack(pLevel, pPos.getX() + 0.5, pPos.getY() + 0.5, pPos.getZ() + 0.5, container.getStackInSlot(i));
+                                }
+                            }
+                        } else {
+                            for (int i = 0; i < itemHandler.getSlots(); ++i) {
+                                Containers.dropItemStack(pLevel, pPos.getX() + 0.5, pPos.getY() + 0.5, pPos.getZ() + 0.5, itemHandler.getStackInSlot(i));
+                            }
                         }
                     }
                 }

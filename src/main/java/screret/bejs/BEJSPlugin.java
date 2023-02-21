@@ -4,6 +4,7 @@ import dev.latvian.mods.kubejs.KubeJSPlugin;
 import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
 import dev.latvian.mods.kubejs.script.BindingsEvent;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import screret.bejs.kubejs.BlockEntityJS;
 import screret.bejs.kubejs.EntityBlockJS;
 
@@ -18,6 +19,8 @@ public class BEJSPlugin extends KubeJSPlugin {
     @Override
     public void registerBindings(BindingsEvent event) {
         event.add("BlockEntity", BlockEntity.class);
+        event.add("ForgeCapabilities", ForgeCapabilities.class);
+        //event.add("BeJSCapabilities", BeJSCapabilities.class);
     }
 
     /*
@@ -32,5 +35,5 @@ public class BEJSPlugin extends KubeJSPlugin {
             }
         }
     }
-     */
+    */
 }

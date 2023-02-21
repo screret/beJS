@@ -17,13 +17,13 @@ import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import screret.bejs.kubejs.BlockEntityJS;
+import screret.bejs.misc.MultipleFluidTank;
+import screret.bejs.misc.MultipleItemStackHandler;
 
 import javax.annotation.Nullable;
 
@@ -37,8 +37,6 @@ public class BeJS {
     public BeJS() {
         //IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
         MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, this::attachCaps);
     }
 
@@ -69,8 +67,8 @@ public class BeJS {
                 event.addCapability(new ResourceLocation(MODID, "energy_cap"), provider);
             }
 
-            if(builder.itemHandler != null) {
-                ItemStackHandler backend = new ItemStackHandler(builder.itemHandler.capacity());
+            if(!builder.itemHandlers.isEmpty()) {
+                MultipleItemStackHandler backend = new MultipleItemStackHandler(builder.itemHandlers);
                 LazyOptional<IItemHandler> optionalStorage = LazyOptional.of(() -> backend);
 
                 ICapabilityProvider provider = new ICapabilitySerializable<CompoundTag>() {
@@ -93,19 +91,19 @@ public class BeJS {
                 event.addCapability(new ResourceLocation(MODID, "item_cap"), provider);
             }
 
-            if(builder.fluidHandler != null) {
-                FluidTank backend = new FluidTank(builder.fluidHandler.capacity(), builder.fluidHandler.validator());
+            if(!builder.fluidHandlers.isEmpty()) {
+                MultipleFluidTank backend = new MultipleFluidTank(builder.fluidHandlers);
                 LazyOptional<IFluidHandler> optionalStorage = LazyOptional.of(() -> backend);
 
                 ICapabilityProvider provider = new ICapabilitySerializable<CompoundTag>() {
                     @Override
                     public CompoundTag serializeNBT() {
-                        return backend.writeToNBT(new CompoundTag());
+                        return backend.serializeNBT();
                     }
 
                     @Override
                     public void deserializeNBT(CompoundTag nbt) {
-                        backend.readFromNBT(nbt);
+                        backend.deserializeNBT(nbt);
                     }
 
                     @Override
