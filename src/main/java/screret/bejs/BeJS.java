@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -16,14 +17,20 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.EnergyStorage;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import screret.bejs.kubejs.BlockEntityJS;
 import screret.bejs.misc.MultipleFluidTank;
 import screret.bejs.misc.MultipleItemStackHandler;
+import screret.bejs.recipe.CustomRecipeJS;
 
 import javax.annotation.Nullable;
 
@@ -34,8 +41,14 @@ public class BeJS {
 
     public static final Logger LOGGER = LogManager.getLogger();
 
+    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZER = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, MODID);
+
+    public static final RegistryObject<RecipeSerializer<CustomRecipeJS>> CUSTOM_JS_RECIPE_SERIALIZER = RECIPE_SERIALIZER.register("custom", CustomRecipeJS.Serializer::new);
+
     public BeJS() {
-        //IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        RECIPE_SERIALIZER.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, this::attachCaps);
     }

@@ -108,16 +108,18 @@ public class EntityBlockJS extends BasicBlockJS {
 
     public static class Builder extends BlockBuilder {
         public transient BlockEntityTypeBuilder blockEntityTypeBuilder;
+        public transient boolean doCreateBlockEntity;
 
         public Builder(ResourceLocation i) {
             super(i);
             blockEntityTypeBuilder = getOrCreateBlockEntityTypeBuilder();
+            doCreateBlockEntity = true;
         }
 
         @Override
         public void createAdditionalObjects() {
             super.createAdditionalObjects();
-            if (blockEntityTypeBuilder != null) {
+            if (blockEntityTypeBuilder != null && doCreateBlockEntity) {
                 RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE.addBuilder(blockEntityTypeBuilder);
             }
         }
@@ -139,6 +141,7 @@ public class EntityBlockJS extends BasicBlockJS {
             if (i == null) {
                 blockEntityTypeBuilder = null;
                 lootTable = null;
+                doCreateBlockEntity = false;
             } else {
                 i.accept(getOrCreateBlockEntityTypeBuilder());
             }
@@ -146,12 +149,11 @@ public class EntityBlockJS extends BasicBlockJS {
             return this;
         }
 
-        /*
         public Builder entity(ResourceLocation blockEntityId) {
             this.blockEntityTypeBuilder = (BlockEntityTypeBuilder) RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE.objects.get(blockEntityId);
+            doCreateBlockEntity = false;
             return this;
         }
-        */
 
         @Override
         public Block createObject() {
