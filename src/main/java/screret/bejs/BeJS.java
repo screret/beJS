@@ -27,10 +27,11 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import screret.bejs.kubejs.BlockEntityJS;
+import screret.bejs.common.BlockEntityJS;
+import screret.bejs.kubejs.BlockEntityTypeBuilder;
 import screret.bejs.misc.MultipleFluidTank;
 import screret.bejs.misc.MultipleItemStackHandler;
-import screret.bejs.recipe.CustomRecipeJS;
+import screret.bejs.recipe.ProcessingRecipe;
 
 import javax.annotation.Nullable;
 
@@ -41,21 +42,15 @@ public class BeJS {
 
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZER = DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, MODID);
-
-    public static final RegistryObject<RecipeSerializer<CustomRecipeJS>> CUSTOM_JS_RECIPE_SERIALIZER = RECIPE_SERIALIZER.register("custom", CustomRecipeJS.Serializer::new);
-
     public BeJS() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
-        RECIPE_SERIALIZER.register(modEventBus);
 
         MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, this::attachCaps);
     }
 
     private void attachCaps(final AttachCapabilitiesEvent<BlockEntity> event) {
         if(event.getObject() instanceof BlockEntityJS beJs) {
-            BlockEntityJS.Builder builder = beJs.builder == null ? (BlockEntityJS.Builder) RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE.objects.get(KubeJSRegistries.blockEntities().getId(beJs.getType())) : beJs.builder;
+            BlockEntityTypeBuilder builder = beJs.builder == null ? (BlockEntityTypeBuilder) RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE.objects.get(KubeJSRegistries.blockEntities().getId(beJs.getType())) : beJs.builder;
             if(builder.energyHandler != null) {
                 EnergyStorage backend = new EnergyStorage(builder.energyHandler.capacity(), builder.energyHandler.maxReceive(), builder.energyHandler.maxExtract());
                 LazyOptional<IEnergyStorage> optionalStorage = LazyOptional.of(() -> backend);

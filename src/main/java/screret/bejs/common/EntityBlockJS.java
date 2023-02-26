@@ -1,4 +1,4 @@
-package screret.bejs.kubejs;
+package screret.bejs.common;
 
 import dev.latvian.mods.kubejs.BuilderBase;
 import dev.latvian.mods.kubejs.RegistryObjectBuilderTypes;
@@ -8,27 +8,17 @@ import dev.latvian.mods.rhino.util.HideFromJS;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
+import screret.bejs.kubejs.BlockEntityTypeBuilder;
 import screret.bejs.misc.IMultipleItemHandler;
 
 import java.util.HashSet;
@@ -36,10 +26,10 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public class EntityBlockJS extends BasicBlockJS {
-    private final BlockEntityTypeBuilder builder;
+    protected final BlockEntityTypeBuilder builder;
     public EntityBlockJS(EntityBlockJS.Builder p) {
         super(p);
-        builder = (BlockEntityTypeBuilder) RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE.objects.get(p.id);
+        builder = p.blockEntityTypeBuilder;
     }
 
     @Nullable
@@ -107,7 +97,7 @@ public class EntityBlockJS extends BasicBlockJS {
     }
 
     public static class Builder extends BlockBuilder {
-        public transient BlockEntityTypeBuilder blockEntityTypeBuilder;
+        public transient BlockEntityJS.Builder blockEntityTypeBuilder;
         public transient boolean doCreateBlockEntity;
 
         public Builder(ResourceLocation i) {
@@ -125,7 +115,7 @@ public class EntityBlockJS extends BasicBlockJS {
         }
 
         @HideFromJS
-        protected BlockEntityTypeBuilder getOrCreateBlockEntityTypeBuilder() {
+        protected BlockEntityJS.Builder getOrCreateBlockEntityTypeBuilder() {
             return blockEntityTypeBuilder == null ? (blockEntityTypeBuilder = new BlockEntityJS.Builder(id)) : blockEntityTypeBuilder;
         }
 
@@ -137,7 +127,7 @@ public class EntityBlockJS extends BasicBlockJS {
             return super.displayName(name);
         }
 
-        public Builder entity(@Nullable Consumer<BlockEntityTypeBuilder> i) {
+        public Builder entity(@Nullable Consumer<BlockEntityJS.Builder> i) {
             if (i == null) {
                 blockEntityTypeBuilder = null;
                 lootTable = null;
@@ -149,8 +139,8 @@ public class EntityBlockJS extends BasicBlockJS {
             return this;
         }
 
-        public Builder entity(ResourceLocation blockEntityId) {
-            this.blockEntityTypeBuilder = (BlockEntityTypeBuilder) RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE.objects.get(blockEntityId);
+        public Builder entityById(ResourceLocation blockEntityId) {
+            this.blockEntityTypeBuilder = (BlockEntityJS.Builder) RegistryObjectBuilderTypes.BLOCK_ENTITY_TYPE.objects.get(blockEntityId);
             doCreateBlockEntity = false;
             return this;
         }
@@ -158,7 +148,7 @@ public class EntityBlockJS extends BasicBlockJS {
         @Override
         public Block createObject() {
             EntityBlockJS block = new EntityBlockJS(this);
-            blockEntityTypeBuilder.addValidBlock(block);
+            if(this.blockEntityTypeBuilder != null) blockEntityTypeBuilder.addValidBlock(block);
             return block;
         }
     }

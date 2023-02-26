@@ -19,6 +19,6 @@ public class NBTSerializableFluidTank extends FluidTank implements INBTSerializa
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        this.readFromNBT(nbt);
+        super.readFromNBT(nbt);
     }
 }

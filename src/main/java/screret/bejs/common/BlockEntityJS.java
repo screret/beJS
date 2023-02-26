@@ -1,4 +1,4 @@
-package screret.bejs.kubejs;
+package screret.bejs.common;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -13,17 +13,18 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import screret.bejs.BeJS;
+import screret.bejs.kubejs.BlockEntityTypeBuilder;
 
 import javax.annotation.Nullable;
 
 public class BlockEntityJS extends BlockEntity implements Nameable {
-    public final Builder builder;
+    public final BlockEntityTypeBuilder builder;
     private final ResourceLocation id;
 
     @Nullable
     private Component name;
 
-    public BlockEntityJS(Builder builder, BlockPos pos, BlockState state) {
+    public BlockEntityJS(BlockEntityTypeBuilder builder, BlockPos pos, BlockState state) {
         super(builder.get(), pos, state);
         if(builder.defaultValues != null)
             builder.defaultValues.accept(this.getPersistentData());
