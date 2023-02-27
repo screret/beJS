@@ -82,7 +82,12 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
     }
 
     public BlockEntityTypeBuilder itemHandler(int capacity) {
-        this.itemHandlers.add(new ItemHandler(capacity));
+        this.itemHandlers.add(new ItemHandler(capacity, true));
+        return this;
+    }
+
+    public BlockEntityTypeBuilder itemHandler(int capacity, boolean canInput) {
+        this.itemHandlers.add(new ItemHandler(capacity, canInput));
         return this;
     }
 
@@ -110,6 +115,6 @@ public abstract class BlockEntityTypeBuilder extends BuilderBase<BlockEntityType
 
     public record EnergyHandler(int capacity, int maxReceive, int maxExtract) {}
     public record FluidHandler(int capacity, Predicate<FluidStack> validator) {}
-    public record ItemHandler(int capacity) {}
+    public record ItemHandler(int capacity, boolean canInput) {}
 
 }

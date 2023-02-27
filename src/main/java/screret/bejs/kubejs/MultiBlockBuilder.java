@@ -9,16 +9,17 @@ import net.minecraft.world.level.block.state.pattern.BlockPatternBuilder;
 import screret.bejs.common.MultiBlockControllerBlockEntity;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class MultiBlockBuilder extends BlockEntityTypeBuilder {
-    public transient Consumer<BlockPatternBuilder> pattern;
+    public transient Supplier<BlockPatternBuilder> pattern;
 
     public MultiBlockBuilder(ResourceLocation i) {
         super(i);
         pattern = null;
     }
 
-    public MultiBlockBuilder pattern(Consumer<BlockPatternBuilder> pattern) {
+    public MultiBlockBuilder pattern(Supplier<BlockPatternBuilder> pattern) {
         this.pattern = pattern;
         return this;
     }

@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.pattern.BlockPatternBuilder;
 import net.minecraft.world.level.block.state.predicate.BlockStatePredicate;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import screret.bejs.common.BlockEntityJS;
 import screret.bejs.common.EntityBlockJS;
 import screret.bejs.common.MultiBlockControllerBlock;
@@ -41,6 +42,8 @@ public class BEJSPlugin extends KubeJSPlugin {
     public void registerBindings(BindingsEvent event) {
         event.add("BlockEntity", BlockEntity.class);
         event.add("ForgeCapabilities", ForgeCapabilities.class);
+
+        event.add("FluidAction", IFluidHandler.FluidAction.class);
 
         event.add("BlockPatternBuilder", BlockPatternBuilder.class);
         event.add("BlockInWorld", BlockInWorldExtended.class);

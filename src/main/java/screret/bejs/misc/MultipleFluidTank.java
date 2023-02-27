@@ -92,6 +92,13 @@ public class MultipleFluidTank implements IMultipleFluidHandler, INBTSerializabl
     }
 
     @Override
+    public void setFluid(int tank, FluidStack stack) {
+        if(tanks.get(tank) instanceof FluidTank fluidTank) {
+            fluidTank.setFluid(stack);
+        }
+    }
+
+    @Override
     public CompoundTag serializeNBT() {
         ListTag tag = new ListTag();
         for (int i = 0; i < this.tanks.size(); ++i) {

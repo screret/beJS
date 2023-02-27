@@ -1,16 +1,12 @@
 package screret.bejs.common;
 
-import dev.latvian.mods.kubejs.KubeJSRegistries;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.pattern.BlockPattern;
-import net.minecraft.world.level.block.state.pattern.BlockPatternBuilder;
-import net.minecraft.world.level.block.state.predicate.BlockStatePredicate;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -33,9 +29,11 @@ public class MultiBlockControllerBlockEntity extends BlockEntityJS {
     public MultiBlockControllerBlockEntity(MultiBlockBuilder builder, BlockPos pPos, BlockState pBlockState) {
         super(builder, pPos, pBlockState);
         this.builder = builder;
-        BlockPatternBuilder blockPatternBuilder = BlockPatternBuilder.start();
-        builder.pattern.accept(blockPatternBuilder);
-        this.pattern = blockPatternBuilder.build();
+        this.pattern = builder.pattern.get().build();
+
+        this.inputEnergy = this.outputEnergy = null;
+        this.inputItem = this.outputItem = null;
+        this.inputFluid = this.outputFluid = null;
     }
 
     public boolean checkStructurePattern() {
@@ -50,14 +48,14 @@ public class MultiBlockControllerBlockEntity extends BlockEntityJS {
         var pattern = this.pattern;
         int maxOffset = Math.max(Math.max(pattern.getWidth(), pattern.getHeight()), pattern.getDepth());
         BlockPos pos = this.getBlockPos();
-        for(BlockPos blockpos : BlockPos.betweenClosed(pos, pos.offset(maxOffset - 1, maxOffset - 1, maxOffset - 1))) {
+        for(BlockPos blockpos : BlockPos.betweenClosed(pos.offset(-maxOffset, -maxOffset, -maxOffset), pos.offset(maxOffset, maxOffset, maxOffset))) {
             BlockEntity entity = this.level.getBlockEntity(blockpos);
 
             if (entity != null) {
                 LazyOptional<IItemHandler> itemCap = entity.getCapability(ForgeCapabilities.ITEM_HANDLER);
                 if(itemCap.isPresent()) {
                     IItemHandler item = itemCap.orElse(null);
-                    if(item.isItemValid(0, new ItemStack(Items.GLASS, 1))) {
+                    if(item.isItemValid(0, new ItemStack(Items.AIR, 1))) {
                         inputItem = item;
                     } else {
                         outputItem = item;
@@ -83,6 +81,7 @@ public class MultiBlockControllerBlockEntity extends BlockEntityJS {
                         outputFluid = fluid;
                     }
                 }
+
             }
         }
     }
@@ -100,7 +99,7 @@ public class MultiBlockControllerBlockEntity extends BlockEntityJS {
                 try {
                     blockEntity.builder.tickCallback.tick(level, pos, state, blockEntity);
                 } catch (Exception exception) {
-                    BeJS.LOGGER.error("beJS tick error!:", exception);
+                    BeJS.LOGGER.error("beJS multiblock tick error!:", exception);
                 }
             }
         }

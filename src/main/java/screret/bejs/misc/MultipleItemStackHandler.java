@@ -11,6 +11,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import screret.bejs.kubejs.BlockEntityTypeBuilder;
+import screret.bejs.util.OutputItemStackHandler;
 
 import java.util.AbstractCollection;
 import java.util.AbstractList;
@@ -36,7 +37,12 @@ public class MultipleItemStackHandler implements IMultipleItemHandler, INBTSeria
     public MultipleItemStackHandler(List<BlockEntityTypeBuilder.ItemHandler> handlers) {
         containers = NonNullList.withSize(handlers.size(), EMPTY);
         for (int i = 0; i < handlers.size(); ++i) {
-            containers.set(i, new ItemStackHandler(handlers.get(i).capacity()));
+            var handler = handlers.get(i);
+            if(handler.canInput()) {
+                containers.set(i, new ItemStackHandler(handler.capacity()));
+            } else {
+                containers.set(i, new OutputItemStackHandler(handler.capacity()));
+            }
         }
     }
 
