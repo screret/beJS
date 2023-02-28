@@ -85,6 +85,10 @@ public class ProcessingRecipe implements Recipe<Container> {
         return this.energy;
     }
 
+    public int getProcessingTime() {
+        return this.processingTime;
+    }
+
     @Nonnull
     @Override
     public boolean canCraftInDimensions(int pWidth, int pHeight) {

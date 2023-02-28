@@ -30,4 +30,8 @@ public class BlockInWorldExtended extends BlockInWorld {
     public static Predicate<BlockInWorld> and(Predicate<BlockInWorld> first, Predicate<BlockInWorld> second) {
         return block -> first.test(block) && second.test(block);
     }
+
+    public static Predicate<BlockInWorld> any() {
+        return block -> true;
+    }
 }

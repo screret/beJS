@@ -6,6 +6,7 @@ import dev.latvian.mods.kubejs.block.BlockBuilder;
 import dev.latvian.mods.kubejs.block.custom.BasicBlockJS;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -15,7 +16,9 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import org.jetbrains.annotations.Nullable;
 import screret.bejs.kubejs.MultiBlockBuilder;
 
@@ -23,19 +26,20 @@ import java.util.function.Consumer;
 
 public class MultiBlockControllerBlock extends BasicBlockJS {
     public static final BooleanProperty VALID = BooleanProperty.create("valid");
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     protected final MultiBlockBuilder builder;
 
     public MultiBlockControllerBlock(Builder p) {
         super(p);
         builder = p.multiBlockBuilder;
-        registerDefaultState(this.getStateDefinition().any().setValue(VALID, false));
+        registerDefaultState(this.getStateDefinition().any().setValue(VALID, false).setValue(FACING, Direction.NORTH));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(VALID);
+        builder.add(VALID, FACING);
     }
 
     @Nullable
@@ -48,7 +52,7 @@ public class MultiBlockControllerBlock extends BasicBlockJS {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockState originalState = super.getStateForPlacement(context);
-        return originalState.setValue(VALID, false);
+        return originalState.setValue(VALID, false).setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Nullable
