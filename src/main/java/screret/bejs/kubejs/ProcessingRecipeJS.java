@@ -5,6 +5,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import dev.latvian.mods.kubejs.fluid.FluidStackJS;
+import dev.latvian.mods.kubejs.item.ingredient.IngredientJS;
+import dev.latvian.mods.kubejs.platform.forge.ingredient.IngredientStackImpl;
 import dev.latvian.mods.kubejs.recipe.*;
 import dev.latvian.mods.kubejs.util.ListJS;
 import net.minecraft.core.NonNullList;
@@ -12,6 +14,7 @@ import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.fluids.FluidStack;
+import org.jetbrains.annotations.Nullable;
 import screret.bejs.recipe.FluidIngredient;
 
 import java.util.ArrayList;
@@ -21,7 +24,7 @@ import static screret.bejs.recipe.ProcessingRecipe.Serializer.*;
 
 @SuppressWarnings("unused")
 public class ProcessingRecipeJS extends RecipeJS {
-    public final List<Ingredient> inputItems = new ArrayList<>(1);
+    public final List<IngredientStackImpl> inputItems = new ArrayList<>(1);
     public final List<FluidIngredient> inputFluids = new ArrayList<>(0);
     public final List<ItemStack> outputItems = new ArrayList<>(1);
     public final List<FluidStack> outputFluids = new ArrayList<>(0);
@@ -33,7 +36,8 @@ public class ProcessingRecipeJS extends RecipeJS {
         }
 
         for (Object o : ListJS.orSelf(args.get(1))) {
-            inputItems.add(parseItemInput(o));
+            var ingredient = parseItemInputAsStack(o);
+            inputItems.add(ingredient);
         }
 
         for (Object o : ListJS.orSelf(args.get(2))) {
@@ -42,7 +46,6 @@ public class ProcessingRecipeJS extends RecipeJS {
 
         for (Object o : ListJS.orSelf(args.get(3))) {
             inputFluids.add(fluidInputFrom(o));
-
         }
     }
 
@@ -71,10 +74,20 @@ public class ProcessingRecipeJS extends RecipeJS {
         return new FluidStack(fs.getFluid(), (int) fs.getAmount(), fs.getNbt());
     }
 
+    public IngredientStackImpl parseItemInputAsStack(@Nullable Object o) {
+        var ingredient = parseItemInput(o);
+
+        if (!(ingredient instanceof IngredientStackImpl)) {
+            return new IngredientStackImpl(ingredient, 1);
+        }
+
+        return (IngredientStackImpl) ingredient;
+    }
+
     @Override
     public void deserialize() {
         if (json.has(INPUT_ITEM_KEY)) {
-            NonNullList<Ingredient> ingredients = ingredientsFromJson(GsonHelper.getAsJsonArray(json, INPUT_ITEM_KEY));
+            NonNullList<IngredientStackImpl> ingredients = ingredientsFromJson(GsonHelper.getAsJsonArray(json, INPUT_ITEM_KEY));
             inputItems.addAll(ingredients);
         }
 
@@ -145,7 +158,7 @@ public class ProcessingRecipeJS extends RecipeJS {
             var in = inputItems.get(i);
 
             if (match.contains(in)) {
-                inputItems.set(i, transformer.transform(this, match, in, with));
+                inputItems.set(i, (IngredientStackImpl) transformer.transform(this, match, in, with));
                 changed = true;
             }
         }
