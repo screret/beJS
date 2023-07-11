@@ -53,9 +53,11 @@ public class MultiBlockControllerBlockEntity extends BlockEntityJS {
 
         Direction stateDirection = this.getBlockState().getValue(MultiBlockControllerBlock.FACING).getOpposite();
         BlockPattern.BlockPatternMatch checked = this.find(this.worldPosition, stateDirection, worldCache) /*this.matches(pattern, start, stateDirection, Direction.UP, worldCache)*/;
-        if(checked != null) {
+        if (checked != null) {
             valid = true;
             this.match = checked;
+        } else {
+            valid = false;
         }
 
         this.level.setBlock(this.worldPosition, this.getBlockState().setValue(MultiBlockControllerBlock.VALID, valid), 0b1111);
